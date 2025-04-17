@@ -8,7 +8,7 @@ from rclpy.parameter import Parameter
 
 from std_msgs.msg import String
 from geometry_msgs.msg import Pose
-from umr_interfaces.msg import DispatchTask, Phase, DispatchResult
+from umr_interfaces.msg import DispatchTask, DispatchResult, Phase, PhaseResult
 
 class TaskManager(Node):
     """Task manager"""
@@ -27,17 +27,22 @@ class TaskManager(Node):
             durability=Durability.TRANSIENT_LOCAL,
         )
 
-        # Subscriber
         self.task_sub = self.create_subscription(
             DispatchTask, "dispatch_task", self.dispatch_cb, self.qos_profile
         )
-        # Publisher
-        self.phase_pub = self.create_publisher(
-            Phase, "phase", self.qos_profile
-        )
+        
         self.result_pub = self.create_publisher(
             DispatchResult, "dispatch_result", 10
         )
+        
+        self.phase_pub = self.create_publisher(
+            Phase, "phase", self.qos_profile
+        )
+
+        self.result_sub = self.create_subscription(
+            PhaseResult, "phase_result", self.result_cb, 10
+        )
+
     
     def dispatch_cb(self, msg: DispatchTask):
         self.get_logger().info(f"New task received: {msg.category}, from: {msg.requester}")
@@ -46,7 +51,7 @@ class TaskManager(Node):
 
         if msg.category == "go_to_places":
             self.phase_queue = list(msg.phases)
-            self.send_phase()
+            self.send_next_phase()
         else:
             self.get_logger().info(f"Unsupported task category: {msg.category}")
             return
@@ -58,13 +63,12 @@ class TaskManager(Node):
         result_msg.message = "Task received successfully"
         self.result_pub.publish(result_msg)
     
-    def send_phase(self):
+    def send_next_phase(self):
         if self.waiting_for_result:
             return
         
         if not self.phase_queue:
             self.get_logger().info(f"Task completed. All phases finished.")
-            #TODO: 피드백 구조
             return
 
         self.current_phase = self.phase_queue.pop(0)
@@ -72,20 +76,12 @@ class TaskManager(Node):
         self.phase_pub.publish(self.current_phase)
         self.waiting_for_result = True
     
-    def result_cb(self, msg:String):
-        #TODO: error code & error_msg 업데이트
-        result = msg.data
-        
-        if result == "success":
-            self.get_logger().info(f"Phase finished: {result}")
-            self.waiting_for_result = False
-            self.send_phase()
-        elif result == "failed":
-            self.get_logger().warn(f"Phase finished: {result}")
-            self.waiting_for_result = False
-            #TODO: retry logic or skip
+    def result_cb(self, msg: PhaseResult):
+        if msg.success:
+            self.send_next_phase()
+
         else:
-            self.get_logger().info(f"Unknown result code: {result}")
+            self.get_logger().warn("failed with error {msg.error_code}: {msg.error_msg}")
             self.waiting_for_result = False
 
 

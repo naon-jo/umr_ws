@@ -20,6 +20,7 @@ set(msg_files
   "msg/LidarInfo.msg"
   "msg/MotionCommand.msg"
   "msg/Phase.msg"
+  "msg/PhaseResult.msg"
 
   "msg/Point2D.msg"
   "msg/Pose2D.msg"
