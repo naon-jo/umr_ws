@@ -1,6 +1,7 @@
 from setuptools import find_packages, setup
+from glob import glob
 
-package_name = 'umr_tasks'
+package_name = 'umr_planner'
 
 setup(
     name=package_name,
@@ -10,6 +11,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        ('share/' + package_name + '/config', glob('config/*.yaml')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -20,7 +22,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "task_manager=umr_tasks.task_manager:main",
+            "goal_executor=umr_planner.goal_executor:main",
+            "phase_interpreter=umr_planner.phase_interpreter:main",
         ],
     },
 )

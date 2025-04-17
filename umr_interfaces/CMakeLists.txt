@@ -23,6 +23,7 @@ set(msg_files
 
   "msg/Point2D.msg"
   "msg/Pose2D.msg"
+  "msg/Goals.msg"
   "msg/Vector2.msg"
 )
 

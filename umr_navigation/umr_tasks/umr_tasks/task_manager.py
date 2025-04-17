@@ -10,10 +10,10 @@ from std_msgs.msg import String
 from geometry_msgs.msg import Pose
 from umr_interfaces.msg import DispatchTask, Phase, DispatchResult
 
-class TaskServer(Node):
-    """Task server"""
+class TaskManager(Node):
+    """Task manager"""
     def __init__(self):
-        super().__init__("task_server")
+        super().__init__("task_manager")
 
         self.phase_queue = []
         self.current_phase = None
@@ -91,7 +91,7 @@ class TaskServer(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = TaskServer()
+    node = TaskManager()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:

@@ -1,0 +1,110 @@
+place1:
+  position:
+    x: 1.095
+    y: -0.628
+    z: 0.0
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.71
+    w: 0.704
+
+place2:
+  position:
+    x: 1.744
+    y: 0.398
+    z: 0.0
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 1.0
+    w: 0.0
+
+place3:
+  position:
+    x: 0.992
+    y: -0.061
+    z: 0.0
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.705
+    w: 0.708
+
+dropoff_station:
+  position:
+    x: -0.405
+    y: -0.737
+    z: 0.0
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+
+charging_station1:
+  position:
+    x: -0.09
+    y: 0.0
+    z: 0.0
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+
+charging_station2:
+  position:
+    x: -0.06
+    y: 0.0
+    z: 0.0
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+
+charging_station3:
+  position:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+
+
+start_point21:
+  position:
+    x: 0.272
+    y: -0.002
+    z: 0.0024
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+
+start_point22:
+  position:
+    x: 0.272
+    y: -0.002
+    z: 0.002
+  orientation:
+    x: -0.0
+    y: 0.0
+    z: -0.714
+    w: 0.699
+
+start_point23:
+  position:
+    x: 0.272
+    y: -0.002
+    z: 0.002
+  orientation:
+    x: -0.0
+    y: 0.0
+    z: -0.714
+    w: 0.699
