@@ -1,0 +1,2 @@
+bool detected
+float32 distance_min

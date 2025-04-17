@@ -1,0 +1,3 @@
+string request_id
+bool success
+string message
