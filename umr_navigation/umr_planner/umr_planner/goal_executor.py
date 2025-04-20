@@ -11,8 +11,6 @@ from umr_interfaces.msg import Goals, MotionCommand, PhaseResult
 from .motion_code_enums import MotionCode
 
 
-
-
 class GoalExecutor(Node):
     def __init__(self):
         super().__init__('goal_executor')
@@ -20,6 +18,7 @@ class GoalExecutor(Node):
         self.goal_queue = []
         self.executing = False
         self.motion_command = None
+        self.awaiting_move = False
 
         self.cb_group = ReentrantCallbackGroup()
 
@@ -28,7 +27,7 @@ class GoalExecutor(Node):
         )
 
         self.motion_sub = self.create_subscription(
-            MotionCommand, "motion_comand", self.motion_cb, 10
+            MotionCommand, "motion_comand", self.motion_cb, 10, callback_group=self.cb_group
         )
 
         self.nav_client = ActionClient(
@@ -49,12 +48,13 @@ class GoalExecutor(Node):
             self.executing = True
             await self.send_next_goal()
 
-    def motion_cb(self, msg: MotionCommand):
+    async def motion_cb(self, msg: MotionCommand):
         self.motion_command = msg.motion_code
 
-        if hasattr(self, 'motion_future') and not self.motion_future.done():
-            self.get_logger().info(f"Motion: {msg.motion_msg}")
-            self.motion_future.set_result(self.motion_command)
+        if self.motion_command == MotionCode.MOVE.value and self.awaiting_move:
+            self.get_logger().info("MOVE command received while awaiting. Proceeding to next goal.")
+            self.awaiting_move = False
+            await self.send_next_goal()
 
 
     async def send_next_goal(self):
@@ -95,18 +95,13 @@ class GoalExecutor(Node):
         nav_result = result.result
         self.get_logger().info(f"Goal result received: {nav_result}")
 
-        self.get_logger().info(f"Waiting for motion command...")
-        if self.motion_command is None:
-            self.motion_future = asyncio.get_event_loop().create_future()
-            motion_code = await self.motion_future
-        else:
-            motion_code = self.motion_command
         
-        if motion_code == MotionCode.MOVE.value:
+        if self.motion_command == MotionCode.MOVE.value:
             self.get_logger().info("Received MOVE. Proceeding to goal_pose.")
             await self.send_next_goal()
         else:
-            self.get_logger().info("Received WAIT. Holding position.")
+            self.awaiting_move = True
+            self.get_logger().info("Waiting for MOVE command...")
 
 
 def main(args=None):

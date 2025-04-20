@@ -59,7 +59,7 @@ class PhaseInterpreter(Node):
         )
         
         self.get_logger().info("Searching for valid stop point around goal...")
-        stop_pose = await self.find_valid_stop_point(goal_pose, stop_distance=1.0)
+        stop_pose = await self.find_valid_stop_point(goal_pose, stop_distance=0.5)
 
         goals_msg = Goals()
         goals_msg.goals = [stop_pose, goal_pose]
