@@ -52,15 +52,10 @@ class GoalExecutor(Node):
     def motion_cb(self, msg: MotionCommand):
         self.motion_command = msg.motion_code
 
-        # if msg.motion_code == MotionCode.WAIT.value:
-        #     if msg.human_detected:
-        #         self.get_logger().info(f"WAIT: {msg.motion_msg}")
-        #         # self.play_alert_sound()
-        #     else:
-        #         self.get_logger().info(f"WAIT: {msg.motion_msg}")
+        if hasattr(self, 'motion_future') and not self.motion_future.done():
+            self.get_logger().info(f"Motion: {msg.motion_msg}")
+            self.motion_future.set_result(self.motion_command)
 
-        # elif msg.motion_code == MotionCode.MOVE.value:
-        #     self.get_logger().info(f"MOVE: {msg.motion_msg}")
 
     async def send_next_goal(self):
         while not self.nav_client.wait_for_server(timeout_sec=5.0):
@@ -100,8 +95,18 @@ class GoalExecutor(Node):
         nav_result = result.result
         self.get_logger().info(f"Goal result received: {nav_result}")
 
-        if self.motion_command == MotionCode.MOVE.value:
+        self.get_logger().info(f"Waiting for motion command...")
+        if self.motion_command is None:
+            self.motion_future = asyncio.get_event_loop().create_future()
+            motion_code = await self.motion_future
+        else:
+            motion_code = self.motion_command
+        
+        if motion_code == MotionCode.MOVE.value:
+            self.get_logger().info("Received MOVE. Proceeding to goal_pose.")
             await self.send_next_goal()
+        else:
+            self.get_logger().info("Received WAIT. Holding position.")
 
 
 def main(args=None):
